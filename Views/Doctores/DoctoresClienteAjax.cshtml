@@ -1,0 +1,101 @@
+﻿@section scripts{
+    <script>
+
+        //declarar url que es el acceso a nuestra api:
+        var url = "https://apidoctoresagz.azurewebsites.net/";
+
+        $(document).ready(function () {
+            cargarDoctores();
+            cargarEspecialidades();
+            $("#btnbuscar").click(function () {
+                var espe = $("#especialidad option:selected").val();
+                var request = "api/doctores/doctoresespecialidad/" + espe;
+                $.ajax({
+                    url: url + request,
+                    method: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        var html = "";
+                        $.each(data, function (ind, doctor) {
+                            html += "<tr>";
+                            html += "<td>" + doctor.apellido + "</td>";
+                            html += "<td>" + doctor.especialidad + "</td>";
+                            html += "<td>" + doctor.salario + "</td>";
+                            html += "</tr>";
+                        });
+                        $("#tabladoctores tbody").html(html);
+                    }
+                });
+            });
+        });
+
+        //funcion cargar docotres que cargará los doctores nada mas arrancar
+        function cargarDoctores() {
+            //coger el request:
+            var request = "api/doctores";
+            //vamos a la peticion con ajax:
+            $.ajax({
+                url: url + request,
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    //10:36
+                    var html = "";
+                    //foreach dato en data (donde están los datos)
+                    $.each(data, function (ind, doctor) {
+                        html += "<tr>";
+                        //analizar qué devulve api/doctores: id, apellido, espe, salario
+                        html += "<td>" + doctor.apellido + "</td>";
+                        html += "<td>" + doctor.especialidad + "</td>";
+                        html += "<td>" + doctor.salario + "</td>";
+                        html += "</tr>";
+                    });
+                    //add el codigo html al body de la tabla
+                    $("#tabladoctores tbody").html(html);
+                }
+            });
+
+        }
+        //load de especialidades
+        function cargarEspecialidades() {
+            var request = "api/doctores/especialidades";
+            $.ajax({
+                url: url + request,
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log("dentro");
+                    var html = "";
+                    $.each(data, function (ind, espe) {
+                        html += `<option value =${espe}>${espe}</option>`
+                        //html += "<option value='" + espe + "'>" + espe + "</option>";
+                        console.log(html);
+                    });
+                    $("#especialidad").html(html);
+                }
+            });
+        }
+    </script>
+}
+
+
+<form method="post">
+    <label>Seleccione especialdiad:</label>
+    <select name="especialidad" id="especialidad"></select>
+
+    <button type="button" class="btn btn-info"
+            id="btnbuscar">
+        Mostrar doctores
+    </button>
+</form>
+<hr />
+<table class="table table-active" id="tabladoctores">
+    <thead>
+        <tr>
+            <th>Apellido</th>
+            <th>Especialidad</th>
+            <th>Salario</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
